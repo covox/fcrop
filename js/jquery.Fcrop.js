@@ -39,7 +39,9 @@
       opacity: 0.2,
       padding: 0,
       fill: 'green',
-      aspectRatio: 0,
+      aspectRatio: 1,
+      maximizeCrop: false,
+      lockAspect: false,
       onChange: function () {}
     },
     coords: {
@@ -69,6 +71,7 @@
       if(!fabric){
         $.error( 'fabric.js not found' );
       }
+
       return this.each(function(c) {
         var crop = {
           json: null,
@@ -125,7 +128,23 @@
           height: image.height()
         });
         canvas.selection = false;
-
+        if (Fcrop.options.maximizeCrop) {
+          var original_aspect = image.width() / image.height();
+          var new_height;
+          var new_width;
+          if ( original_aspect >= Fcrop.options.aspectRatio ) {
+            // If image is wider than thumbnail (in aspect ratio sense)
+            new_height = image.height();
+            new_width  = image.height() / Fcrop.options.aspectRatio;
+          }
+          else {
+            // If the thumbnail is wider than the image
+            new_width  = image.width();
+            new_height = image.width() / Fcrop.options.aspectRatio;
+          }
+          Fcrop.options.width = new_width;
+          Fcrop.options.height = new_height;
+        }
         var rect = new fabric.Rect({
           left:     Fcrop.options.left,
           top:      Fcrop.options.top,
@@ -136,7 +155,7 @@
           fill:     Fcrop.options.fill
         });
 
-        if (Fcrop.aspectRatio > 0) {
+        if (Fcrop.options.lockAspect) {
           rect.lockUniScaling=true;
         }
 
@@ -152,7 +171,6 @@
     {
       if (typeof(opt) !== 'object') opt = {};
       Fcrop.options = $.extend(options, opt);
-
       $.each(['onChange','onSelect','onRelease'],function(i,e) {
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });

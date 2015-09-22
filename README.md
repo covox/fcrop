@@ -19,7 +19,9 @@
         opacity: 0.2,
         padding: 0,
         fill: 'green',
-        aspectRatio: 0.5,
+        aspectRatio: 1,
+        maximizeCrop: false,
+        lockAspect: false,
         onChange: function(c) {
           console.log(c);
         }
