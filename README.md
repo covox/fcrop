@@ -1,5 +1,9 @@
 # Fcrop
-JQuery plugin for crop image
+ jquery.Fcrop.js v0.0.1
+ jQuery Image Cropping Plugin - released under MIT License
+ Author: Andrew Godin <covoxx@gmail.com>
+ https://github.com/covox/fcrop
+ Copyright (c) 2015 ITFrogs
 
 # Usage
 
