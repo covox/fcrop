@@ -45,8 +45,8 @@
       onChange: function () {}
     },
     coords: {
-      x1: 0,
-      y1: 0,
+      x: 0,
+      y: 0,
       x2: 0,
       y2: 0,
       w:  0,
@@ -56,7 +56,7 @@
     init : function( options ) {
       Fcrop.options = $.extend(Fcrop.defaults, options);
       Fcrop.coords = {
-        x1: Fcrop.options.left,
+        x: Fcrop.options.left,
         xy: Fcrop.options.top,
         x2: Fcrop.options.left + Fcrop.options.width,
         y2: Fcrop.options.top + Fcrop.options.height,
@@ -100,8 +100,8 @@
               if (options.target.left) {
                 Fcrop.coords.w =   parseInt(options.target.width * options.target.scaleX);
                 Fcrop.coords.h =   parseInt(options.target.height * options.target.scaleY);
-                Fcrop.coords.x1 =  parseInt(options.target.left);
-                Fcrop.coords.y1 =  parseInt(options.target.top);
+                Fcrop.coords.x =  parseInt(options.target.left);
+                Fcrop.coords.y =  parseInt(options.target.top);
                 Fcrop.coords.x2 =  parseInt(options.target.left + Fcrop.coords.w);
                 Fcrop.coords.y2 =  parseInt(options.target.top + Fcrop.coords.h);
               }
