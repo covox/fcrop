@@ -109,7 +109,7 @@
         var src = image.attr('src');
         var a = image.closest('a');
 
-        if (a) {
+        if (a.lenght) {
           a.after('<div class="fcropCanvasBlock" style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
           a.css('display', 'none');
         }
@@ -123,7 +123,10 @@
           height: image.height()
         });
         Fcrop.canvas.selection = false;
-        Fcrop.canvas.setBackgroundImage(src, Fcrop.canvas.renderAll.bind(Fcrop.canvas));
+        Fcrop.canvas.setBackgroundImage(src, Fcrop.canvas.renderAll.bind(Fcrop.canvas), {
+          width: image.width(),
+          height: image.height()
+        });
 
         Fcrop.drawRect();
 
