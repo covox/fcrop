@@ -45,8 +45,8 @@
       onChange: function () {}
     },
     coords: {
-      x: 0,
-      y: 0,
+      x:  0,
+      y:  0,
       x2: 0,
       y2: 0,
       w:  0,
@@ -56,7 +56,7 @@
     init : function( options ) {
       Fcrop.options = $.extend(Fcrop.defaults, options);
       Fcrop.coords = {
-        x: Fcrop.options.left,
+        x:  Fcrop.options.left,
         xy: Fcrop.options.top,
         x2: Fcrop.options.left + Fcrop.options.width,
         y2: Fcrop.options.top + Fcrop.options.height,
@@ -98,12 +98,12 @@
                 });
               }
               if (options.target.left) {
-                Fcrop.coords.w =   parseInt(options.target.width * options.target.scaleX);
-                Fcrop.coords.h =   parseInt(options.target.height * options.target.scaleY);
-                Fcrop.coords.x =  parseInt(options.target.left);
-                Fcrop.coords.y =  parseInt(options.target.top);
-                Fcrop.coords.x2 =  parseInt(options.target.left + Fcrop.coords.w);
-                Fcrop.coords.y2 =  parseInt(options.target.top + Fcrop.coords.h);
+                Fcrop.coords.w =    parseInt(options.target.width * options.target.scaleX);
+                Fcrop.coords.h =    parseInt(options.target.height * options.target.scaleY);
+                Fcrop.coords.x =    parseInt(options.target.left);
+                Fcrop.coords.y =    parseInt(options.target.top);
+                Fcrop.coords.x2 =   parseInt(options.target.left + Fcrop.coords.w);
+                Fcrop.coords.y2 =   parseInt(options.target.top + Fcrop.coords.h);
               }
               Fcrop.options.onChange(Fcrop.coords);
             });
@@ -115,11 +115,11 @@
         var a = image.closest('a');
 
         if (a) {
-          a.after('<div style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
+          a.after('<div class="fcropCanvasBlock" style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
           a.css('display', 'none');
         }
         else {
-          image.after('<div style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
+          image.after('<div class="fcropCanvasBlock" style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
           image.css('display', 'none');
         }
 
@@ -135,7 +135,7 @@
           if ( original_aspect >= Fcrop.options.aspectRatio ) {
             // If image is wider than thumbnail (in aspect ratio sense)
             new_height = image.height();
-            new_width  = image.height() / Fcrop.options.aspectRatio;
+            new_width  = image.height() * Fcrop.options.aspectRatio;
           }
           else {
             // If the thumbnail is wider than the image
@@ -145,6 +145,7 @@
           Fcrop.options.width = new_width;
           Fcrop.options.height = new_height;
         }
+
         var rect = new fabric.Rect({
           left:     Fcrop.options.left,
           top:      Fcrop.options.top,
@@ -175,8 +176,19 @@
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });
     },
-    destroy : function( ) {
+    destroy : function() {
       return this.each(function(){
+        var image = $(this);
+        var src = image.attr('src');
+        var a = image.closest('a');
+
+        if (a) {
+          a.css('display', 'block');
+        }
+        else {
+          image.css('display', 'block');
+        }
+        $('.fcropCanvasBlock').remove();
         $(window).unbind('.fcrop');
       })
     }
