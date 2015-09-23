@@ -42,7 +42,8 @@
       aspectRatio: 1,
       maximizeCrop: false,
       lockAspect: false,
-      onChange: function () {}
+      onChange: function () {},
+      setApi: function () {}
     },
     coords: {
       x:  0,
@@ -53,18 +54,12 @@
       h:  0
     },
     options: null,
+    rect: null,
+    canvas: null,
+    image: null,
     init : function( options ) {
       Fcrop.options = $.extend(Fcrop.defaults, options);
-      Fcrop.coords = {
-        x:  Fcrop.options.left,
-        xy: Fcrop.options.top,
-        x2: Fcrop.options.left + Fcrop.options.width,
-        y2: Fcrop.options.top + Fcrop.options.height,
-        w:  Fcrop.options.width,
-        h:  Fcrop.options.height
-      };
-
-      $.each(['onChange','onSelect','onRelease'],function(i,e) {
+      $.each(['onChange','onSelect','onRelease', 'setApi'],function(i,e) {
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });
 
@@ -110,7 +105,7 @@
           }
         };
         obj = this;
-        var image = $(obj);
+        var image = Fcrop.image = $(obj);
         var src = image.attr('src');
         var a = image.closest('a');
 
@@ -123,30 +118,52 @@
           image.css('display', 'none');
         }
 
-        var canvas = new fabric.Canvas("fcrop_canvas", {
+        Fcrop.canvas = new fabric.Canvas("fcrop_canvas", {
           width:  image.width(),
           height: image.height()
         });
-        canvas.selection = false;
-        if (Fcrop.options.maximizeCrop) {
-          var original_aspect = image.width() / image.height();
-          var new_height;
-          var new_width;
-          if ( original_aspect >= Fcrop.options.aspectRatio ) {
-            // If image is wider than thumbnail (in aspect ratio sense)
-            new_height = image.height();
-            new_width  = image.height() * Fcrop.options.aspectRatio;
-          }
-          else {
-            // If the thumbnail is wider than the image
-            new_width  = image.width();
-            new_height = image.width() / Fcrop.options.aspectRatio;
-          }
-          Fcrop.options.width = new_width;
-          Fcrop.options.height = new_height;
-        }
+        Fcrop.canvas.selection = false;
+        Fcrop.canvas.setBackgroundImage(src, Fcrop.canvas.renderAll.bind(Fcrop.canvas));
 
-        var rect = new fabric.Rect({
+        Fcrop.drawRect();
+
+        crop.observe('object:moving', Fcrop.canvas);
+        crop.observe('object:scaling', Fcrop.canvas);
+
+        Fcrop.options.setApi(Fcrop);
+      });
+    },
+    drawRect: function() {
+      if (Fcrop.options.maximizeCrop) {
+        var original_aspect = Fcrop.image.width() / Fcrop.image.height();
+        var new_height;
+        var new_width;
+        if ( original_aspect >= Fcrop.options.aspectRatio ) {
+          // If image is wider than thumbnail (in aspect ratio sense)
+          new_height = Fcrop.image.height();
+          new_width  = Fcrop.image.height() * Fcrop.options.aspectRatio;
+        }
+        else {
+          // If the thumbnail is wider than the image
+          new_width  = Fcrop.image.width();
+          new_height = Fcrop.image.width() / Fcrop.options.aspectRatio;
+        }
+        Fcrop.options.width = new_width;
+        Fcrop.options.height = new_height;
+
+        Fcrop.coords = {
+          x:  Fcrop.options.left,
+          y:  Fcrop.options.top,
+          x2: Fcrop.options.left + Fcrop.options.width,
+          y2: Fcrop.options.top + Fcrop.options.height,
+          w:  Fcrop.options.width,
+          h:  Fcrop.options.height
+        };
+      }
+      Fcrop.options.onChange(Fcrop.coords);
+
+      if (!Fcrop.rect) {
+        Fcrop.rect = new fabric.Rect({
           left:     Fcrop.options.left,
           top:      Fcrop.options.top,
           width:    Fcrop.options.width,
@@ -155,26 +172,37 @@
           padding:  Fcrop.options.padding,
           fill:     Fcrop.options.fill
         });
+        Fcrop.canvas.add(Fcrop.rect);
+      }
+      else {
+        Fcrop.rect.set({
+          left:     Fcrop.options.left,
+          top:      Fcrop.options.top,
+          width:    Fcrop.options.width,
+          height:   Fcrop.options.height,
+          opacity:  Fcrop.options.opacity,
+          padding:  Fcrop.options.padding,
+          fill:     Fcrop.options.fill
+        });
+      }
 
-        if (Fcrop.options.lockAspect) {
-          rect.lockUniScaling=true;
-        }
+      if (Fcrop.options.lockAspect) {
+        Fcrop.rect.lockUniScaling=true;
+      }
 
-        rect.setControlVisible('mtr', false);
-        canvas.add(rect);
-        canvas.setBackgroundImage(src, canvas.renderAll.bind(canvas));
-
-        crop.observe('object:moving', canvas);
-        crop.observe('object:scaling', canvas);
-      });
+      Fcrop.rect.setControlVisible('mtr', false);
+      Fcrop.canvas.renderAll();
+      Fcrop.canvas.calcOffset();
+      Fcrop.canvas.setActiveObject(Fcrop.rect);
     },
     setOptions: function(opt)
     {
       if (typeof(opt) !== 'object') opt = {};
-      Fcrop.options = $.extend(options, opt);
-      $.each(['onChange','onSelect','onRelease'],function(i,e) {
+      Fcrop.options = $.extend(Fcrop.options, opt);
+      $.each(['onChange','onSelect','onRelease', 'setApi'],function(i,e) {
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });
+      Fcrop.drawRect();
     },
     destroy : function() {
       return this.each(function(){
@@ -190,6 +218,8 @@
         }
         $('.fcropCanvasBlock').remove();
         $(window).unbind('.fcrop');
+        Fcrop.canvas = null;
+        Fcrop.rect = null;
       })
     }
   };
