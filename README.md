@@ -26,3 +26,8 @@
           console.log(c);
         }
     });
+
+# Example
+<p>
+    <img src="http://i.imgur.com/cwyFZqK.png" alt="example" />
+</p>
