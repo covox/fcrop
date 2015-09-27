@@ -43,7 +43,7 @@
       maximizeCrop: false,
       lockAspect: false,
       onChange: function () {},
-      setApi: function () {}
+      getApi: function () {}
     },
     coords: {
       x:  0,
@@ -59,7 +59,7 @@
     image: null,
     init : function( options ) {
       Fcrop.options = $.extend(Fcrop.defaults, options);
-      $.each(['onChange','onSelect','onRelease', 'setApi'],function(i,e) {
+      $.each(['onChange','onSelect','onRelease', 'getApi'],function(i,e) {
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });
 
@@ -109,7 +109,7 @@
         var src = image.attr('src');
         var a = image.closest('a');
 
-        if (a.lenght) {
+        if (image.closest('a')) {
           a.after('<div class="fcropCanvasBlock" style="width: '+ image.width() +'px; height: '+ image.height() +'px; -moz-user-select: none; -webkit-user-select: none;"><canvas id="fcrop_canvas"></div>');
           a.css('display', 'none');
         }
@@ -133,7 +133,7 @@
         crop.observe('object:moving', Fcrop.canvas);
         crop.observe('object:scaling', Fcrop.canvas);
 
-        Fcrop.options.setApi(Fcrop);
+        Fcrop.options.getApi(Fcrop);
       });
     },
     drawRect: function() {
@@ -202,7 +202,7 @@
     {
       if (typeof(opt) !== 'object') opt = {};
       Fcrop.options = $.extend(Fcrop.options, opt);
-      $.each(['onChange','onSelect','onRelease', 'setApi'],function(i,e) {
+      $.each(['onChange','onSelect','onRelease', 'getApi'],function(i,e) {
         if (typeof(Fcrop.options[e]) !== 'function') Fcrop.options[e] = function () {};
       });
       Fcrop.drawRect();

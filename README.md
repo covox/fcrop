@@ -12,18 +12,19 @@
     or
     
     $('#fcrop').fcrop({
-        left: 0,
-        top: 0,
-        width: 100,
-        height: 100,
-        opacity: 0.2,
-        padding: 0,
-        fill: 'green',
-        aspectRatio: 1,
-        maximizeCrop: false,
-        lockAspect: false,
-        onChange: function(c) {
-          console.log(c);
+        left: 		0,
+        top: 		0,
+        width: 		100,
+        height: 	100,
+        opacity: 	0.2,
+        padding: 	0,
+        fill: 		'green',
+        aspectRatio: 	1,
+        maximizeCrop: 	false,
+        lockAspect: 	false,
+        onChange: 	function(c) {
+        },
+	getApi: 	function(api) {
         }
     });
 
