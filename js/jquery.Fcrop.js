@@ -92,14 +92,13 @@
                   top: canvas.getHeight() - options.target.height * options.target.scaleY
                 });
               }
-              if (options.target.left) {
-                Fcrop.coords.w =    parseInt(options.target.width * options.target.scaleX);
-                Fcrop.coords.h =    parseInt(options.target.height * options.target.scaleY);
-                Fcrop.coords.x =    parseInt(options.target.left);
-                Fcrop.coords.y =    parseInt(options.target.top);
-                Fcrop.coords.x2 =   parseInt(options.target.left + Fcrop.coords.w);
-                Fcrop.coords.y2 =   parseInt(options.target.top + Fcrop.coords.h);
-              }
+              Fcrop.coords.w =    parseInt(options.target.width * options.target.scaleX);
+              Fcrop.coords.h =    parseInt(options.target.height * options.target.scaleY);
+              Fcrop.coords.x =    parseInt(options.target.left);
+              Fcrop.coords.y =    parseInt(options.target.top);
+              Fcrop.coords.x2 =   parseInt(options.target.left + Fcrop.coords.w);
+              Fcrop.coords.y2 =   parseInt(options.target.top + Fcrop.coords.h);
+
               Fcrop.options.onChange(Fcrop.coords);
             });
           }
