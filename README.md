@@ -23,8 +23,6 @@
         maximizeCrop: 	false,
         lockAspect: 	false,
         onChange: 	function(c) {
-        },
-	getApi: 	function(api) {
         }
     });
 
