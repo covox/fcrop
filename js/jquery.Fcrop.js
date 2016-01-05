@@ -80,6 +80,13 @@
         if (typeof(self.config[e]) !== 'function') self.config[e] = function () {};
       });
 
+      self.coords.w =    Math.abs(parseInt(self.config.width));
+      self.coords.h =    Math.abs(parseInt(self.config.height));
+      self.coords.x =    Math.abs(parseInt(self.config.left));
+      self.coords.y =    Math.abs(parseInt(self.config.top));
+      self.coords.x2 =   Math.abs(parseInt(self.config.left + self.coords.w));
+      self.coords.y2 =   Math.abs(parseInt(self.config.top + self.coords.h));
+
       if(!fabric){
         $.error( 'fabric.js not found' );
       }
@@ -87,32 +94,62 @@
         json: null,
         observe: function (eventName, canvas) {
           canvas.on(eventName, function(options){
-            if (options.target.left < 1) {
+
+
+            if (options.target.left < 0) {
               options.target.set({
-                left: 0
+                left: 0,
+                lockScalingX:true
               });
             }
-            if (options.target.top < 1) {
+            if (options.target.top < 0) {
               options.target.set({
-                top: 0
+                top: 0,
+                lockScalingY:true
               });
             }
             if (options.target.left > (canvas.getWidth() - options.target.width * options.target.scaleX)) {
               options.target.set({
-                left: canvas.getWidth() - options.target.width * options.target.scaleX
+                left: canvas.getWidth() - options.target.width * options.target.scaleX,
+                lockScalingX:true
               });
             }
             if (options.target.top > (canvas.getHeight() - options.target.height * options.target.scaleY)) {
               options.target.set({
-                top: canvas.getHeight() - options.target.height * options.target.scaleY
+                top: canvas.getHeight() - options.target.height * options.target.scaleY,
+                lockScalingY:true
               });
             }
-            self.coords.w =    parseInt(options.target.width * options.target.scaleX);
-            self.coords.h =    parseInt(options.target.height * options.target.scaleY);
-            self.coords.x =    parseInt(options.target.left);
-            self.coords.y =    parseInt(options.target.top);
-            self.coords.x2 =   parseInt(options.target.left + self.coords.w);
-            self.coords.y2 =   parseInt(options.target.top + self.coords.h);
+
+            self.coords.w =    Math.abs(parseInt(options.target.width * options.target.scaleX));
+            self.coords.h =    Math.abs(parseInt(options.target.height * options.target.scaleY));
+            self.coords.x =    Math.abs(parseInt(options.target.left));
+            self.coords.y =    Math.abs(parseInt(options.target.top));
+            self.coords.x2 =   Math.abs(parseInt(options.target.left + self.coords.w));
+            self.coords.y2 =   Math.abs(parseInt(options.target.top + self.coords.h));
+
+            self.config.onChange(self.coords);
+          });
+        },
+        fix: function (eventName, canvas) {
+          canvas.on(eventName, function(options){
+            options.target.set({
+              lockScalingX:false,
+              lockScalingY:false
+            });
+
+            if (options.target.left < 0) {
+              options.target.set({
+                left: 0
+              });
+              self.coords.x = 0;
+            }
+            if (options.target.top < 0) {
+              options.target.set({
+                top: 0
+              });
+              self.coords.y = 0;
+            }
 
             self.config.onChange(self.coords);
           });
@@ -147,6 +184,7 @@
 
       crop.observe('object:moving', self.canvas);
       crop.observe('object:scaling', self.canvas);
+      crop.fix('object:modified', self.canvas);
     },
     drawRect: function() {
       var self = this;
@@ -178,31 +216,35 @@
         };
       }
 
-      self.config.onChange(self.coords);
-
       if (!self.rect) {
         self.rect = new fabric.Rect({
-          left:     self.config.left,
-          top:      self.config.top,
-          width:    self.config.width,
-          height:   self.config.height,
-          opacity:  self.config.opacity,
-          padding:  self.config.padding,
-          fill:     self.config.fill
+          left:               self.config.left,
+          top:                self.config.top,
+          width:              self.config.width,
+          height:             self.config.height,
+          opacity:            self.config.opacity,
+          padding:            self.config.padding,
+          fill:               self.config.fill,
+          transparentCorners: false,
+          cornerSize:         12
         });
         self.canvas.add(self.rect);
       }
       else {
         self.rect.set({
-          left:     self.config.left,
-          top:      self.config.top,
-          width:    self.config.width,
-          height:   self.config.height,
-          opacity:  self.config.opacity,
-          padding:  self.config.padding,
-          fill:     self.config.fill
+          left:               self.config.left,
+          top:                self.config.top,
+          width:              self.config.width,
+          height:             self.config.height,
+          opacity:            self.config.opacity,
+          padding:            self.config.padding,
+          fill:               self.config.fill,
+          transparentCorners: false,
+          cornerSize:         12
         });
       }
+
+      self.config.onChange(self.coords);
 
       if (self.config.lockAspect) {
         self.rect.lockUniScaling=true;
@@ -223,22 +265,22 @@
       self.drawRect();
     },
     destroy : function() {
-      return this.each(function(){
+      if (this.canvas) {
         var image = $(this);
         var src = image.attr('src');
         var a = image.closest('a');
 
-        if (a) {
+        if (a[0]) {
           a.css('display', 'block');
         }
         else {
           image.css('display', 'block');
         }
-        $('.fcropCanvasBlock').remove();
-        $(window).unbind('.fcrop');
-        Fcrop.canvas = null;
-        Fcrop.rect = null;
-      })
+      }
+      $('.fcropCanvasBlock').remove();
+      $(window).unbind('.fcrop');
+      this.canvas = null;
+      this.rect = null;
     },
     generateUUID: function() {
       var d = new Date().getTime();
